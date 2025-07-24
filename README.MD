@@ -54,7 +54,7 @@ The agent will:
 ## 📸 Screenshot
 
 ![Workflow Screenshot](https://user-images.githubusercontent.com/your-screenshot-link.jpg)  
-(Replace this with your GitHub screenshot or leave as is)
+
 
 ---
 
