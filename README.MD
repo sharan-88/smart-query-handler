@@ -53,7 +53,7 @@ The agent will:
 
 ## 📸 Screenshot
 
-![Workflow Screenshot](https://user-images.githubusercontent.com/your-screenshot-link.jpg)  
+![Workflow Screenshot](https://github.com/sharan-88/smart-query-handler/blob/main/Screenshot%202025-07-24%20123245.png)  
 
 
 ---
