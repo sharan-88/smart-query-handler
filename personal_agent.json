@@ -1,0 +1,520 @@
+{
+  "name": "personal_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "53b79b65-4873-495b-af34-7c93b6c8f0b1",
+      "name": "Telegram Trigger",
+      "webhookId": "1f629535-fa81-40a5-b316-244bc45a9120",
+      "credentials": {
+        "telegramApi": {
+          "id": "mX1MBIue3HL1j4OE",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "c97a6923-52e2-4de8-93ba-c076e64ed0fb"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5fd2c730-cb52-4d54-a346-2ffb0bab1a95",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "d2e96434-e36c-49e8-9297-c88c127b53f9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "accb7ce5-328c-4379-aa78-ec3a67ad8dd8",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -112
+      ],
+      "id": "182ff318-1b74-4d1e-8fb8-4db4f2eb5439",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        96
+      ],
+      "id": "9fbf6585-c134-4372-ae7c-28dcf016cff7",
+      "name": "Get a file",
+      "webhookId": "e96af7cc-4733-4a36-bc54-3a5bdaa35965",
+      "credentials": {
+        "telegramApi": {
+          "id": "mX1MBIue3HL1j4OE",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        752,
+        208
+      ],
+      "id": "1ecaf9d1-84fa-4cd3-8e0f-7aeea733053e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CAWHg97F3PNzpdF4",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=yor are a highly efficient and innovative assistant ,channeling the mindset and personally of elon musk.Today's date is {{ $now }},\nyour primary goal is to helpsolve problems,stramline task, and provide bold,futuristic solutions while maintaining focus and precision.\n\nEmail management :\n   utilize the \"readEmail\" tool to retrieve unread emails,prioritizing those with significant content over promotional and spam emails, summarize each email concisely, including the sender,subject,and a brief overview of the content \nyou also access to gmail sender tool which allows you to write a email and send anyone \nyou have access to real-time market data\nyou have access to google calender where you need to set the event after verifing empty slots and retierve the events based on date from calender if requested\noffer additional details only if explicitily requested ,keeping the main advice clear and actionable"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "3a20c74a-7efe-4de1-b52a-b5a4c9c942a9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        -48
+      ],
+      "id": "edfbad46-913f-43ab-9468-58064c3da21f",
+      "name": "Send a text message",
+      "webhookId": "e14896e6-5c4f-472e-a958-c3b142f7d851",
+      "credentials": {
+        "telegramApi": {
+          "id": "mX1MBIue3HL1j4OE",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "UNREAD"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        224
+      ],
+      "id": "d5884550-7ce7-41ce-a45a-0a7cdedbc3be",
+      "name": "Get many messages in Gmail",
+      "webhookId": "53e3bcb6-96fb-4223-a341-5e889f17271c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5LTphpdhYgAHv4cH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('to','raw email address  of recipient') }}",
+        "subject": "={{ $fromAI(\"subject\",\"clear and concise subject\")}} ",
+        "emailType": "text",
+        "message": "={{ $fromAI(\"body\",\"body of the gmail itself\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1168,
+        224
+      ],
+      "id": "4dbeaafb-9858-4f7c-9fe7-9213193ab08b",
+      "name": "Send a message in Gmail",
+      "webhookId": "85ef865d-a762-46fd-8bc5-06fec07978a6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5LTphpdhYgAHv4cH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "sharanabasavajkr99@gmail.com",
+          "mode": "list",
+          "cachedResultName": "sharanabasavajkr99@gmail.com"
+        },
+        "start": "={{ $fromAI(\"startTime\",\"Thisis the start time of event\")}}",
+        "end": "={{ $fromAI(\"endTime\",\"This is the end time of event\")}}",
+        "additionalFields": {
+          "summary": "={{ $fromAI(\"summary\",\"This is summary of the event\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "2c29dca6-c7b9-40fd-9ea6-84afe456aa2c",
+      "name": "Create an event in Google Calendar1",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "R4OZXzzzZNoY9MhK",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "sharanabasavajkr99@gmail.com",
+          "mode": "list",
+          "cachedResultName": "sharanabasavajkr99@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1520,
+        160
+      ],
+      "id": "9a03f72a-546c-4bf6-9c1d-8bc05be4210b",
+      "name": "Get many events in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "cyhvAsZgUiky8mHQ",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const escapeMarkdownV2 = (text) => {\n  return text.replace(/([_*[\\]()~`>#+=|{}.!\\\\-])/g, '\\\\$1');\n};\n\nreturn [\n  {\n    json: {\n      output: escapeMarkdownV2($json.output)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        -48
+      ],
+      "id": "5b78d4f2-421a-411b-901d-ff6fe3bf9a89",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        336
+      ],
+      "id": "8ec882d5-1b60-4855-93c4-ce7d5a557c8b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "operation": "speechToText",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        560,
+        80
+      ],
+      "id": "921b0d7e-3fbf-4415-a504-ff43801b21cb",
+      "name": "Transcribe audio or video",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "U5B8aBtr4FRvfl1F",
+          "name": "ElevenLabs account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe audio or video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe audio or video": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b86208a1-7790-4fa2-a462-85ffce4a1e76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "540ae2bd19085f3524433265619e685eb49acd1600f133d3ca5509dc9c6ebdd2"
+  },
+  "id": "3yVgcs0FdoWvl9Ak",
+  "tags": []
+}
